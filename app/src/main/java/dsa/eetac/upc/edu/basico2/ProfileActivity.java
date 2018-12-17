@@ -1,15 +1,22 @@
 package dsa.eetac.upc.edu.basico2;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -21,36 +28,44 @@ public class ProfileActivity extends MainActivity {
 
     private APIRest myAPIRest;
     private Retrofit retrofit;
+    private User user;
     public String message;
-    private static final String URL_INTERNET="https://avatars2.githubusercontent.com/u/43338918?v=4";
-    private static final String URL_INTERNET_PICASO="https://avatars3.githubusercontent.com/u/43338979?v=4";
-
-    private ImageView activityProfileIVInternet;
+    public TextView numrepos;
+    public TextView numfollowers;
+    ImageView activityProfileIVInternet;
+    private RecyclerView recyclerView;
+    private Recycler recycler;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recycler = new Recycler(this);
+        recyclerView.setAdapter(recycler);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         Intent intent = getIntent();
         message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
-        TextView textView = findViewById(R.id.textView2);
-        textView.setText(message);
+        activityProfileIVInternet = (ImageView)findViewById(R.id.activityProfileIVInternet);
+        numrepos=(TextView)findViewById(R.id.numrepositoriestxt);
+        numfollowers =(TextView)findViewById(R.id.numfollowingtxt);
 
-        setUpView();
-        loadImagenByInternetUrlWithPicasso();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading...");
+        progressDialog.setMessage("Waiting for the server");
+        progressDialog.setCancelable(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
 
         myAPIRest = APIRest.createAPIRest();
-            getData();
+        getData();
     }
 
-    private void setUpView(){
-        activityProfileIVInternet=findViewById(R.id.activityProfileIVInternet);
-    }
-
-    private void loadImagenByInternetUrlWithPicasso(){
-        Picasso.with(getApplicationContext()).load(URL_INTERNET).into(activityProfileIVInternet);
-    }
 
     public void getData(){
         Call<User> userCall = myAPIRest.getProfile(message);
@@ -60,17 +75,67 @@ public class ProfileActivity extends MainActivity {
                 if (response.isSuccessful()){
                     User user = response.body();
                     Log.i("Login:" + user.login, response.message());
+                    Picasso.with(getApplicationContext()).load(user.avatar_url).into(activityProfileIVInternet);
+                    Log.i("Repos:" + user.public_repos, response.message());
+                    numrepos.setText(user.public_repos);
+                    Log.i("Followers:" + user.followers, response.message());
+                    numfollowers.setText(user.followers);
+                    progressDialog.hide();
                 }
                 else{
-                    Log.e("No api connection", String.valueOf(response.errorBody()));
+                    Log.e("Response failure", String.valueOf(response.errorBody()));
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ProfileActivity.this);
+
+                    alertDialogBuilder
+                            .setTitle("Error")
+                            .setMessage(response.message())
+                            .setCancelable(false)
+                            .setPositiveButton("OK", ((dialog, which) -> finish()));
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 Log.e("No api connection", t.getMessage());
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ProfileActivity.this);
+
+                alertDialogBuilder
+                        .setTitle("Error")
+                        .setMessage(t.getMessage())
+                        .setCancelable(false)
+                        .setPositiveButton("OK", ((dialog, which) -> finish()));
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+
             }
         });
+    }
 
+    public void getFollowers(){
+        Call<List<User>> followerCall = myAPIRest.getFollowers(message);
+        followerCall.enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                if (response.isSuccessful()){
+                    List<User> newlist = response.body();
+                    recycler.addFollowers(newlist);
+                    for(int i = 0; i < newlist.size(); i++) {
+                        Log.i("Login: " + newlist.get(i).login, response.message());
+                        Log.i("Size of the list: " + newlist.size(), response.message());
+                    }
+                    progressDialog.hide();
+                }
+                else{
+                    Log.e("Response failure", response.message());
+                }
+            }
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                Log.e("No api connection", t.getMessage());
+
+            }
+        });
     }
 }

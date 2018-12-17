@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -19,7 +20,7 @@ public interface APIRest {
     Call<User> getProfile(@Path("username") String username);
 
     @GET("{username}/followers")
-    Call<Follower> getFollowers(@Path("username") String username);
+    Call<List<User>> getFollowers(@Path("username") String username);
 
     static APIRest createAPIRest() {
         Gson gson = new GsonBuilder()

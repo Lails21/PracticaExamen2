@@ -13,7 +13,8 @@ public class User {
     int id;
     @SerializedName("avatar_url")
     @Expose
-    String avatar_url;@SerializedName("followers")
+    String avatar_url;
+    @SerializedName("followers")
     @Expose
     int followers;
     @SerializedName("following")
@@ -78,5 +79,9 @@ public class User {
 
     public void setPublic_repos(int public_repos) {
         this.public_repos = public_repos;
+    }
+
+    public String toString(){
+        return(login);
     }
 }
