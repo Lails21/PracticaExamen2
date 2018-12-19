@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -19,12 +20,16 @@ public class Recycler extends RecyclerView.Adapter<Recycler.ViewHolder> {
 
     //Asign the text TextView to the text1 in the layout
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView text;
         private ImageView followerImageView;
         private TextView followerNameView;
+        public LinearLayout linearLayout;
+
         public ViewHolder(View v) {
             super(v);
-            text = (TextView) v.findViewById(android.R.id.text1);
+            followerNameView=v.findViewById(R.id.usernametxt);
+            followerImageView=v.findViewById(R.id.imageView);
+            linearLayout = v.findViewById(R.id.linearLayout);
+
         }
     }
 

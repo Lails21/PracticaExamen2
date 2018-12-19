@@ -10,11 +10,12 @@
         android:id="@+id/nameText"
         android:layout_width="303dp"
         android:layout_height="50dp"
+        android:layout_marginTop="113dp"
         android:ems="10"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="113dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button"

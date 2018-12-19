@@ -16,9 +16,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="68dp"
+        android:layout_marginEnd="7dp"
         android:text="Repositories:"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/numReposTXT"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -32,7 +32,7 @@
         app:layout_constraintTop_toBottomOf="@+id/repositoriestxt" />
 
     <TextView
-        android:id="@+id/numrepositoriestxt"
+        android:id="@+id/numReposTXT"
         android:layout_width="35dp"
         android:layout_height="21dp"
         android:layout_marginTop="32dp"
@@ -47,7 +47,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/numrepositoriestxt" />
+        app:layout_constraintTop_toBottomOf="@+id/numReposTXT" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"

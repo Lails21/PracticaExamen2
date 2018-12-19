@@ -49,11 +49,13 @@ public class ProfileActivity extends MainActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        numrepos=(TextView)findViewById(R.id.numReposTXT);
+        numfollowers =(TextView)findViewById(R.id.numfollowingtxt);
+
         Intent intent = getIntent();
         message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
         activityProfileIVInternet = (ImageView)findViewById(R.id.activityProfileIVInternet);
-        numrepos=(TextView)findViewById(R.id.numrepositoriestxt);
-        numfollowers =(TextView)findViewById(R.id.numfollowingtxt);
+
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Loading...");
@@ -63,7 +65,9 @@ public class ProfileActivity extends MainActivity {
         progressDialog.show();
 
         myAPIRest = APIRest.createAPIRest();
+
         getData();
+        getFollowers();
     }
 
 
@@ -72,18 +76,20 @@ public class ProfileActivity extends MainActivity {
         userCall.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
+                Log.i("GITHUB", "onRESPONSE"+response.code());
                 if (response.isSuccessful()){
                     User user = response.body();
-                    Log.i("Login:" + user.login, response.message());
+                    Log.i("GITHUB",  "login "+user.login +" "+ response.message());
                     Picasso.with(getApplicationContext()).load(user.avatar_url).into(activityProfileIVInternet);
-                    Log.i("Repos:" + user.public_repos, response.message());
-                    numrepos.setText(user.public_repos);
-                    Log.i("Followers:" + user.followers, response.message());
-                    numfollowers.setText(user.followers);
+                    Log.i("GITHUB",  "repos "+user.public_repos +" " +response.message());
+                    numrepos.setText(""+user.public_repos);
+                    Log.i("GITHUB" , "followers: "+user.followers+ " "+response.message());
+                    numfollowers.setText(""+user.followers);
                     progressDialog.hide();
                 }
                 else{
-                    Log.e("Response failure", String.valueOf(response.errorBody()));
+                    Log.e("GITHUB", String.valueOf(response.errorBody()));
+                    progressDialog.hide();
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ProfileActivity.this);
 
                     alertDialogBuilder
@@ -98,7 +104,8 @@ public class ProfileActivity extends MainActivity {
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                Log.e("No api connection", t.getMessage());
+                Log.e("GITHUB", t.getMessage());
+                progressDialog.hide();
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ProfileActivity.this);
 
                 alertDialogBuilder
@@ -120,20 +127,24 @@ public class ProfileActivity extends MainActivity {
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                 if (response.isSuccessful()){
                     List<User> newlist = response.body();
-                    recycler.addFollowers(newlist);
+                    if (newlist.size() != 0){
+                        recycler.addFollowers(newlist);
+                    }
+                    progressDialog.hide();
                     for(int i = 0; i < newlist.size(); i++) {
                         Log.i("Login: " + newlist.get(i).login, response.message());
                         Log.i("Size of the list: " + newlist.size(), response.message());
                     }
-                    progressDialog.hide();
                 }
                 else{
                     Log.e("Response failure", response.message());
+                    progressDialog.hide();
                 }
             }
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
                 Log.e("No api connection", t.getMessage());
+                progressDialog.hide();
 
             }
         });
