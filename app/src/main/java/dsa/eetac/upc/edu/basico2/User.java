@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class User {
 
+    // Declaramos todas las variables que queremos coger del JSON (poner exactamente el mismo nombre que sale en la API)
     @SerializedName("login")
     @Expose
     String login;
@@ -24,6 +25,7 @@ public class User {
     @Expose
     int public_repos;
 
+    // Constructor de todas las variables que tiene User
     public User(String login, int id, String avatar_url, int followers, int following, int public_repos) {
         this.login = login;
         this.id = id;
@@ -33,6 +35,7 @@ public class User {
         this.public_repos = public_repos;
     }
 
+    // Setters & Getters
     public String getLogin() {
         return login;
     }
@@ -79,9 +82,5 @@ public class User {
 
     public void setPublic_repos(int public_repos) {
         this.public_repos = public_repos;
-    }
-
-    public String toString(){
-        return(login);
     }
 }
